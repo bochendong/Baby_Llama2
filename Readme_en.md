@@ -89,7 +89,10 @@ While training, the first `max_seq_len - 1` tokens are used as input, and the la
   <img src="./Img/6.png" width = 500>
 </p>
 
+
 Llama leverages a transformer architecture with the following enhancements:
+
+A step by step explanation for transformer<sup>[[5]](https://github.com/bochendong/Fantastic-ML-Method/tree/main/Transformer)</sup>。
 
 #### Root Mean Square layer normalization (RMS Norm)
 

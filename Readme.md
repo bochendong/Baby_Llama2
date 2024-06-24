@@ -17,13 +17,15 @@
 
 [Engilsh Version](./Readme_en.md)
 
-## 👋 Introduction
+## 👋 介绍
 
 Baby Llama2 项目致力于详细指导您如何构建自己的大型语言模型（LLM）。本项目通过使用多样化的数据集和先进的技术，为您展示了从头到尾的模型训练过程。无论您是研究人员、学生还是对自然语言处理领域感兴趣的开发者，本项目都是一个宝贵的学习资源。
 
-## 🚀 Getting Started
+本项目为Baby-Llama2-Chinese<sup>[[0]](https://github.com/DLLXW/baby-llama2-chinese?tab=readme-ov-file)</sup>的学习笔记。
 
-### Dataset Download
+## 🚀 开始
+
+### 下载数据集
 
 我们使用多个数据集来为模型训练提供丰富多变的语言环境：
 
@@ -89,7 +91,12 @@ tokenizer = LlamaTokenizer.from_pretrained("/output/path")
   <img src="./Img/6.png" width = 500>
 </p>
 
+
+对于传统transformer不了解的同学，可以移步这里<sup>[[5]](https://github.com/bochendong/Fantastic-ML-Method/tree/main/Transformer)</sup>。
+
 使用了基于transformer的架构，并做了如下3点改进:
+
+
 
 #### Root Mean Square layer normalization (RMS Norm)
 
