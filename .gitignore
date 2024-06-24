@@ -1,0 +1,8 @@
+*.bin
+*.pth
+*.pyc
+*.parquet
+
+data/
+
+.DS_Store
