@@ -42,23 +42,22 @@ class FeedForward(nn.Module):
         return self.dropout(self.w2(F.silu(self.w1(x)) * self.w3(x)))
     
 class TransformerBlock(nn.Module):
-    def __init__(self, layer_id, n_heads, embed_dim,
-                 multiple_of, dropout, norm_eps):
+    def __init__(self, layer_id, config):
         super().__init__()
-        self.n_heads = n_heads
-        self.dim = embed_dim
-        self.head_dim = embed_dim // n_heads
-        self.attention = Attention(n_heads, embed_dim, dropout)
+        self.n_heads = config["n_heads"]
+        self.dim = config["embed_dim"]
+        self.head_dim = config["embed_dim"] // config["n_heads"]
+        self.attention = Attention(config["n_heads"], config["embed_dim"], config["dropout"])
 
         self.feed_forward = FeedForward(
-            dim = embed_dim,
-            hidden_dim = 4 * embed_dim,
-            multiple_of = multiple_of,
-            dropout = dropout,
+            dim = config["embed_dim"],
+            hidden_dim = 4 * config["embed_dim"],
+            multiple_of = config["multiple_of"],
+            dropout = config["dropout"],
         )
         self.layer_id = layer_id
-        self.attention_norm = RMSNorm(embed_dim, eps=norm_eps)
-        self.ffn_norm = RMSNorm(embed_dim, eps=norm_eps)
+        self.attention_norm = RMSNorm(config["embed_dim"], eps=config["norm_eps"])
+        self.ffn_norm = RMSNorm(config["embed_dim"], eps=config["norm_eps"])
 
     def forward(self, x, freqs_cos, freqs_sin):
         h = x + self.attention.forward(self.attention_norm(x), freqs_cos, freqs_sin)
@@ -68,28 +67,27 @@ class TransformerBlock(nn.Module):
 class Transformer(nn.Module):
     last_loss: Optional[torch.Tensor]
 
-    def __init__(self, vocab_size, n_layers, n_heads, max_seq_len, 
-                 embed_dim, dropout, norm_eps, multiple_of):
+    def __init__(self, config):
         super().__init__()
-        self.vocab_size = vocab_size
-        self.n_layers = n_layers
+        self.vocab_size = config["vocab_size"]
+        self.n_layers = config["n_layers"]
 
-        self.tok_embeddings = nn.Embedding(vocab_size, embed_dim)
-        self.dropout = nn.Dropout(dropout)
+        self.tok_embeddings = nn.Embedding(config["vocab_size"], config["embed_dim"])
+        self.dropout = nn.Dropout(config["dropout"])
 
         self.layers = torch.nn.ModuleList()
 
-        for layer_id in range(n_layers):
-            self.layers.append(TransformerBlock(layer_id, n_heads, embed_dim, multiple_of, dropout, norm_eps))
+        for layer_id in range(config["n_layers"]):
+            self.layers.append(TransformerBlock(layer_id, config))
 
-        self.norm = RMSNorm(embed_dim, eps=norm_eps)
-        self.output = nn.Linear(embed_dim, vocab_size, bias=False)
+        self.norm = RMSNorm(config["embed_dim"], eps=config["norm_eps"])
+        self.output = nn.Linear(config["embed_dim"], config["vocab_size"], bias=False)
 
         # share the unembedding parameters with the embedding parameters
         self.tok_embeddings.weight = self.output.weight # https://paperswithcode.com/method/weight-tying
 
-        # some useful precompute for the RoPE relative positional embeddings
-        freqs_cos, freqs_sin = precompute_freqs_cis(embed_dim // n_heads, max_seq_len)
+        # Precompute for the RoPE relative positional embeddings
+        freqs_cos, freqs_sin = precompute_freqs_cis(config["embed_dim"] // config["n_heads"], config["max_seq_len"])
         self.register_buffer("freqs_cos", freqs_cos, persistent=False)
         self.register_buffer("freqs_sin", freqs_sin, persistent=False)
 
@@ -98,7 +96,7 @@ class Transformer(nn.Module):
         # apply special scaled init to the residual projections, per GPT-2 paper
         for pn, p in self.named_parameters():
             if pn.endswith('w3.weight') or pn.endswith('wo.weight'):
-                torch.nn.init.normal_(p, mean=0.0, std=0.02/math.sqrt(2 * n_layers))
+                torch.nn.init.normal_(p, mean=0.0, std=0.02/math.sqrt(2 * config["n_layers"]))
 
         # Initialize attribute for the loss of the last forward call. This will be set if the forward is called with a targets tensor.
         self.last_loss = None

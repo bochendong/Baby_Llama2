@@ -13,5 +13,7 @@
     "grad_clip" : 1.0,
     "batch_size" : 32,
     "vocab_size" : 64793,
-    "max_epoch" : 1
+    "max_epoch" : 1,
+    "device": "cpu",
+    "norm_eps": 1e-5
 }

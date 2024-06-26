@@ -22,18 +22,6 @@ def reshape_for_broadcast(freqs: torch.Tensor, x: torch.Tensor) -> torch.Tensor:
     shape = [d if i == 1 or i == x.ndim - 1 else 1 for i, d in enumerate(x.shape)]
     return freqs.view(shape)
 
-
-def repeat_kv(x: torch.Tensor, n_rep: int) -> torch.Tensor:
-    """torch.repeat_interleave(x, dim=2, repeats=n_rep)"""
-    bs, slen, n_kv_heads, head_dim = x.shape
-    if n_rep == 1:
-        return x
-    return (
-        x[:, :, :, None, :]
-        .expand(bs, slen, n_kv_heads, n_rep, head_dim)
-        .reshape(bs, slen, n_kv_heads * n_rep, head_dim)
-    )
-
 def apply_rotary_emb(xq: torch.Tensor, xk: torch.Tensor, freqs_cos: torch.Tensor, freqs_sin: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
     """
     Applies rotary positional embedding to query and key tensors.
@@ -79,7 +67,7 @@ class Attention(nn.Module):
             dropout (float): Dropout rate.
         """
         super(Attention, self).__init__()
-        self.num_heads = n_heads
+        self.n_heads = n_heads
         self.dropout = dropout
         self.head_dim = embed_dim // n_heads
         self.scaling_factor = math.sqrt(self.head_dim)
@@ -110,21 +98,18 @@ class Attention(nn.Module):
 
         # Project input x to queries (xq), keys (xk), and values (xv)
         xq, xk, xv = self.wq(x), self.wk(x), self.wv(x)
-        xq = xq.view(bsz, seqlen, self.n_local_heads, self.head_dim)
-        xk = xk.view(bsz, seqlen, self.n_local_kv_heads, self.head_dim)
-        xv = xv.view(bsz, seqlen, self.n_local_kv_heads, self.head_dim)
+        xq = xq.view(bsz, seqlen, self.n_heads, self.head_dim)
+        xk = xk.view(bsz, seqlen, self.n_heads, self.head_dim)
+        xv = xv.view(bsz, seqlen, self.n_heads, self.head_dim)
 
         # Apply rotary positional embeddings
         xq, xk = apply_rotary_emb(xq, xk, freqs_cos, freqs_sin)
-
-        xk = repeat_kv(xk, self.n_rep)  # (bs, seqlen, n_local_heads, head_dim)
-        xv = repeat_kv(xv, self.n_rep)  # (bs, seqlen, n_local_heads, head_dim)
 
         # Transpose for attention operation: from (batch, sequence, heads, features)
         # to (batch, heads, sequence, features) for easier manipulation
         xq, xk, xv = xq.transpose(1, 2), xk.transpose(1, 2), xv.transpose(1, 2)
 
-        output, _ = torch.nn.functional.scaled_dot_product_attention(
+        output  = torch.nn.functional.scaled_dot_product_attention(
             xq, xk, xv, 
             attn_mask=None, 
             dropout_p=self.dropout if self.training else 0.0)

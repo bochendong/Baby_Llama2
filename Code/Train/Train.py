@@ -1,7 +1,8 @@
 import torch
 import math
+import logging
 
-def get_lr(it, learning_rate, min_lr, warmup_iters, lr_decay_iters):
+def get_lr(it, learning_rate = 3e-4, min_lr = 1e-5, warmup_iters = 1000, lr_decay_iters = 80000):
     # 1) linear warmup for warmup_iters steps
     if it < warmup_iters:
         return learning_rate * it / warmup_iters
@@ -35,6 +36,8 @@ def train_epoch(epoch, model, raw_model, train_loader, optimizer, scaler,
             logits = model(X, Y)
             loss = raw_model.last_loss
             loss = loss / gradient_accumulation_steps
+        
+        logging.info(f'step: {step}, loss: {loss.item(): .4f}')
         
         scaler.scale(loss).backward()
         if (step + 1) % gradient_accumulation_steps == 0:
