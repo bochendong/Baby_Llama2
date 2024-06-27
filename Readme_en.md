@@ -15,7 +15,7 @@
   
 </p>
 
-[Chinese Version](./Readme_en.md)
+[Chinese Version](./Readme.md)
 
 ## 👋 Introduction
 
