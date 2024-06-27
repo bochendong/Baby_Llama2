@@ -125,13 +125,60 @@ The matrix R<sub>m</sub> on the left represents the position encoding for the m-
 
 ### Train
 
-### Fine Tune
+#### Pre Train
 
-To be continued
+<p align="center">
+  <img src="./Img/10.png">
+</p>
 
-#### SFT
+[【Pretrain 代码】](./Code/Train/Train.py)
 
-#### Full Fine-tuning
+#### Fine Tune (SFT)
+
+**Data Tokenizer**
+
+The SFT dataset refers to an open source dataset for self-instruction learning of language models. Generally speaking, it consists of prompts and answers, such as:
+
+```
+"prompt": "What are the three primary colors?",
+"answer": "The three primary colors usually refer to red, green and blue (RGB). They are ...
+```
+
+Tokenize the prompt and answer.
+
+<p align="center">
+  <img src="./Img/11.png">
+</p>
+
+
+**Data Loader**
+
+Combine prompt and answer with special tokens, pad the input sequence if necessary
+
+<p align="center">
+  <img src="./Img/12.png">
+</p>
+
+Create the loss mask to distinguish between prompt, answer, and padding
+
+<p align="center">
+  <img src="./Img/13.png">
+</p>
+
+在用于训练时，将前max_seq_len - 1个token作为input, 将后max_seq_len - 1个token作为target
+
+<p align="center">
+  <img src="./Img/14.png"  width = 600>
+</p>
+
+**Train**
+
+<p align="center">
+  <img src="./Img/15.png"  width = 600>
+</p>
+
+[【SFT 代码】](./Code/SFT)
+
 
 ## Contributors
 
@@ -145,12 +192,19 @@ To be continued
         <br>
         <sub><sup>Team Leader</sup></sub>
       </td>
+      <td align="center" valign="middle" width="128">
+         <a href="https://github.com/zhangenzhi">
+          <img src="https://github.com/zhangenzhi.png?size=128" />
+          Zhangen Zhi
+        </a>
+        <br>
+        <sub><sup>Team Leader</sup></sub>
+      </td>
   </tbody>
 </table>
 
 ## 📝 License
 
 [MIT License](https://github.com/leon-ai/leon/blob/develop/LICENSE.md)
-
 
 
