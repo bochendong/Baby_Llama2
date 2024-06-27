@@ -23,6 +23,8 @@ def train_epoch(epoch, model, raw_model, train_loader, optimizer, scaler,
     iter_per_epoch=len(train_loader)
     for step, (X, Y) in enumerate(train_loader):
         X, Y = X.to(device), Y.to(device)
+        print('X size', X.size())
+        print('Y size', Y.size())
 
         if decay_lr is None:
             lr = get_lr(epoch*iter_per_epoch+step)
@@ -36,8 +38,10 @@ def train_epoch(epoch, model, raw_model, train_loader, optimizer, scaler,
             logits = model(X, Y)
             loss = raw_model.last_loss
             loss = loss / gradient_accumulation_steps
+
+        print('logits size', logits.size())
         
-        logging.info(f'step: {step}, loss: {loss.item(): .4f}')
+        logging.info(f'step: {step}, lr, {lr: .4f}, loss: {loss.item(): .4f}')
         
         scaler.scale(loss).backward()
         if (step + 1) % gradient_accumulation_steps == 0:

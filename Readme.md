@@ -128,13 +128,47 @@ RoPE通过绝对位置编码的方式实现相对位置编码，既保持了绝�
 
 ### Train
 
-### Fine Tune
+#### Pre Train
 
-待续。。。
+<p align="center">
+  <img src="./Img/10.png">
+</p>
 
-#### SFT
+[【Pretrain 代码】](./Code/Train/Train.py)
 
-#### Full Fine-tuning
+#### Fine Tune (SFT)
+
+**Data Tokenizer**
+
+<p align="center">
+  <img src="./Img/11.png">
+</p>
+
+
+**Data Loader**
+
+<p align="center">
+  <img src="./Img/12.png">
+</p>
+
+
+<p align="center">
+  <img src="./Img/13.png">
+</p>
+
+
+<p align="center">
+  <img src="./Img/14.png"  width = 600>
+</p>
+
+**Train**
+
+<p align="center">
+  <img src="./Img/15.png"  width = 600>
+</p>
+
+[【SFT 代码】](./Code/SFT)
+
 
 ## Contributors
 
