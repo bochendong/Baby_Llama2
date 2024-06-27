@@ -36,6 +36,8 @@ Baby Llama2 项目致力于详细指导您如何构建自己的大型语言模�
 | WuDaoCorpora  | 由清华大学和北京智源研究院共同发布的大规模中文语料库 | [链接](https://data.baai.ac.cn/details/WuDaoCorporaText)  |
 
 
+下载数据集后放置在根目录`Data`文件夹下。
+
 ### Tokenizer
 
 构建LLM的分词器涉及选择合适的文本分割方法。您可以构建自定义分词器<sup>[[1]](https://github.com/karpathy/llama2.c)</sup>，或是选择开源模型训练好的分词器，例如ChatGLM2-6B，DistilBertTokenizer, Llama2等, 比如。
@@ -140,6 +142,15 @@ RoPE通过绝对位置编码的方式实现相对位置编码，既保持了绝�
 
 **Data Tokenizer**
 
+SFT数据集指的是针对语言模型自指令学习的开源数据集，一般来说都由 prompt 和 answer组成，比如：
+
+```
+"prompt": "三原色是什么？",
+"answer": "三原色通常指的是红色、绿色和蓝色（RGB）。它们是通过 ...
+```
+
+首先将prompt 和 answer组放入分词器。
+
 <p align="center">
   <img src="./Img/11.png">
 </p>
@@ -147,15 +158,19 @@ RoPE通过绝对位置编码的方式实现相对位置编码，既保持了绝�
 
 **Data Loader**
 
+在prompt 后添加一个<BOS> token, 在answer 后添加一个<EOS> token。
+
 <p align="center">
   <img src="./Img/12.png">
 </p>
 
+创建 loss mask 来区分 prompt, answer, 与 padding。
 
 <p align="center">
   <img src="./Img/13.png">
 </p>
 
+在用于训练时，将前max_seq_len - 1个token作为input, 将后max_seq_len - 1个token作为target
 
 <p align="center">
   <img src="./Img/14.png"  width = 600>
@@ -178,6 +193,14 @@ RoPE通过绝对位置编码的方式实现相对位置编码，既保持了绝�
          <a href="https://github.com/bochendong">
           <img src="https://github.com/bochendong.png?size=128" />
           Bochen Dong
+        </a>
+        <br>
+        <sub><sup>Team Leader</sup></sub>
+      </td>
+      <td align="center" valign="middle" width="128">
+         <a href="https://github.com/zhangenzhi">
+          <img src="https://github.com/zhangenzhi.png?size=128" />
+          Zhangen Zhi
         </a>
         <br>
         <sub><sup>Team Leader</sup></sub>
