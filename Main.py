@@ -1,6 +1,6 @@
 import os
 
-import pandas as pd
+# import pandas as pd
 
 import torch
 import torch.distributed as dist
@@ -75,7 +75,7 @@ def train(rank, num_gpus, config):
             if rank == 0:
                 torch.save(raw_model.state_dict(), f'Weight/epoch_{epoch}.pth')
 
-    if SFT:
+    '''if SFT:
         if not os.path.exists('./data/SFT/sft_data.csv'):
             df = pd.DataFrame(columns=['prompt', 'answer'])
             questions, answers = cleanAlpacaGpt4File()
@@ -96,7 +96,7 @@ def train(rank, num_gpus, config):
                             learning_rate=3e-4, decay_lr=None, grad_clip=1.0,
                             device=device)
             if rank == 0:
-                torch.save(raw_model.state_dict(), f'Weight/SFT_epoch_{epoch}.pth')
+                torch.save(raw_model.state_dict(), f'Weight/SFT_epoch_{epoch}.pth')'''
     
 
 if __name__ == '__main__':
