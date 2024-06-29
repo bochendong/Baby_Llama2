@@ -3,6 +3,5 @@
 *.pyc
 *.parquet
 
-data/
 
 .DS_Store
