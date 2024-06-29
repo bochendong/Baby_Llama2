@@ -4,13 +4,12 @@ import numpy as np
 from tqdm import tqdm
 from Code.Tokenizer.GLMTokenizer import ChatGLMTokenizer
 
-DataPath = './data'
 FileName = {
-    "Wiki": "/wikipedia-cn-20230720-filtered/wikipedia-cn-20230720-filtered.json"
+    "Wiki": "./data/wikipedia-cn-20230720-filtered/wikipedia-cn-20230720-filtered.json"
 }
 
 def process_wiki_clean(tokenizer):
-    wiki_path = os.path.join(DataPath, FileName['Wiki'])
+    wiki_path = FileName['Wiki']
     with open(wiki_path,'r',encoding='utf-8') as f:
         data=json.load(f)
     doc_ids=[]
