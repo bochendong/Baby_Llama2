@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 #SBATCH -A bif146
-#SBATCH -o gpu_check_output.o%J
+#SBATCH -o babyllama.o%J
 #SBATCH -t 02:00:00
 #SBATCH -N 1
 #SBATCH -p batch
