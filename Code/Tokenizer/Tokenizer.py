@@ -6,7 +6,7 @@ from Code.Tokenizer.GLMTokenizer import ChatGLMTokenizer
 
 DataPath = './data'
 FileName = {
-    "Wiki": "wikipedia-cn-20230720-filtered.json"
+    "Wiki": "/wikipedia-cn-20230720-filtered/wikipedia-cn-20230720-filtered.json"
 }
 
 def process_wiki_clean(tokenizer):
