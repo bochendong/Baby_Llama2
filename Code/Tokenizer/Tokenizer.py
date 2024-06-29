@@ -5,7 +5,7 @@ from tqdm import tqdm
 from Code.Tokenizer.GLMTokenizer import ChatGLMTokenizer
 
 FileName = {
-    "Wiki": "./data/wikipedia-cn-20230720-filtered/wikipedia-cn-20230720-filtered.json"
+    "Wiki": "./data/wikipedia-cn-20230720-filtered.json"
 }
 
 def process_wiki_clean(tokenizer):
