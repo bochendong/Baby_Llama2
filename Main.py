@@ -108,7 +108,11 @@ if __name__ == '__main__':
     setup_logging("./Log/training.log")
     num_gpus = check_available_gpus()
 
-    mp.set_start_method('spawn')
+    try:
+        mp.set_start_method('spawn')
+    except RuntimeError:
+        pass
+    
     processes = []
     for rank in range(num_gpus):
         p = torch.multiprocessing.Process(target=init_process, args=(rank, num_gpus, train, config))
