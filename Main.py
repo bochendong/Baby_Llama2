@@ -112,13 +112,13 @@ if __name__ == '__main__':
         mp.set_start_method('spawn')
     except RuntimeError:
         pass
-    
-    processes = []
+
+    '''processes = []
     for rank in range(num_gpus):
         p = torch.multiprocessing.Process(target=init_process, args=(rank, num_gpus, train, config))
         p.start()
         processes.append(p)
 
     for p in processes:
-        p.join()
+        p.join()'''
 
