@@ -55,11 +55,11 @@ def train(rank, num_gpus, config):
         num_workers=0 if config["device"] == 'cpu' else 4,
         sampler=train_sampler
     )
-    '''
 
     model = Transformer(config).to(device)
     ddp_model = DDP(model, device_ids=[rank])
 
+    '''
     scaler = torch.cuda.amp.GradScaler(enabled=(config['dtype'] == 'float16'))
     optimizer = ddp_model.module.configure_optimizers(config["weight_decay"], config["learning_rate"], 
                                                       (config["beta1"], config["beta2"]), config["device"])
