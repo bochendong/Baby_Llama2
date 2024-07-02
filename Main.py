@@ -52,6 +52,7 @@ def train(rank, num_gpus, config):
     else:
         device = torch.device(f'cuda:{rank}')
 
+    print(f"Device: {device}")
     data_path_list = ['./data/pretrain_data.bin']
 
 
