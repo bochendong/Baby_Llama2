@@ -45,7 +45,7 @@ def check_available_gpus():
 def train(rank, num_gpus, config):
     torch.manual_seed(0)
     device = torch.device(f'cuda:{rank}')
-    '''
+
     data_path_list = ['./data/pretrain_data.bin']
     train_ds = PretrainDataset(data_path_list, max_length=config["max_seq_len"], use_memmap=True)
     train_sampler = torch.utils.data.distributed.DistributedSampler(train_ds, num_replicas=num_gpus, rank=rank)
@@ -73,7 +73,7 @@ def train(rank, num_gpus, config):
             if rank == 0:
                 torch.save(raw_model.state_dict(), f'Weight/epoch_{epoch}.pth')
 
-
+    '''
     SFT = config["SFT"]
     
     if SFT:
