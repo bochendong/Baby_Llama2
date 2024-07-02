@@ -46,8 +46,7 @@ def train(rank, num_gpus, config):
     torch.manual_seed(0)
     device = torch.device(f'cuda:{rank}')
     torch.cuda.set_device(device)
-    SFT = config["SFT"]
-
+    '''
     data_path_list = ['./data/pretrain_data.bin']
     train_ds = PretrainDataset(data_path_list, max_length=config["max_seq_len"], use_memmap=True)
     train_sampler = torch.utils.data.distributed.DistributedSampler(train_ds, num_replicas=num_gpus, rank=rank)
@@ -75,7 +74,10 @@ def train(rank, num_gpus, config):
             if rank == 0:
                 torch.save(raw_model.state_dict(), f'Weight/epoch_{epoch}.pth')
 
-    '''if SFT:
+
+    SFT = config["SFT"]
+    
+    if SFT:
         if not os.path.exists('./data/SFT/sft_data.csv'):
             df = pd.DataFrame(columns=['prompt', 'answer'])
             questions, answers = cleanAlpacaGpt4File()
@@ -113,12 +115,12 @@ if __name__ == '__main__':
     except RuntimeError:
         pass
 
-    '''processes = []
+    processes = []
     for rank in range(num_gpus):
         p = torch.multiprocessing.Process(target=init_process, args=(rank, num_gpus, train, config))
         p.start()
         processes.append(p)
 
     for p in processes:
-        p.join()'''
+        p.join()
 
