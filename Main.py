@@ -45,7 +45,6 @@ def check_available_gpus():
 def train(rank, num_gpus, config):
     torch.manual_seed(0)
     device = torch.device(f'cuda:{rank}')
-    torch.cuda.set_device(device)
     '''
     data_path_list = ['./data/pretrain_data.bin']
     train_ds = PretrainDataset(data_path_list, max_length=config["max_seq_len"], use_memmap=True)
