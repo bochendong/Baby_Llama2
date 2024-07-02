@@ -57,9 +57,9 @@ def train(rank, num_gpus, config):
     )
 
     model = Transformer(config).to(device)
+    '''
     ddp_model = DDP(model, device_ids=[rank])
 
-    '''
     scaler = torch.cuda.amp.GradScaler(enabled=(config['dtype'] == 'float16'))
     optimizer = ddp_model.module.configure_optimizers(config["weight_decay"], config["learning_rate"], 
                                                       (config["beta1"], config["beta2"]), config["device"])
