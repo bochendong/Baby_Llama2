@@ -65,12 +65,12 @@ def train(rank, num_gpus, config):
     train_loader = torch.utils.data.DataLoader(
         train_ds, batch_size=config["batch_size"],
         pin_memory=False, drop_last=False, shuffle=False,
-        num_workers=0 if config["device"] == 'cpu' else 4,
+        num_workers=0 if num_gpus == 0 else 4,
         sampler=train_sampler
     )
 
     model = Transformer(config).to(device)
-
+    '''
     if (num_gpus > 1):
         model = DDP(model, device_ids=[rank])
         raw_model = model.module
@@ -90,7 +90,6 @@ def train(rank, num_gpus, config):
             if rank == 0:
                 torch.save(raw_model.state_dict(), f'Weight/epoch_{epoch}.pth')
 
-    '''
     SFT = config["SFT"]
     
     if SFT:
