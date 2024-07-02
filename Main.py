@@ -44,11 +44,23 @@ def check_available_gpus():
 
 def train(rank, num_gpus, config):
     torch.manual_seed(0)
-    device = torch.device(f'cuda:{rank}')
+
+    if (num_gpus == 0):
+        device = torch.device(f'cpu')
+    elif (num_gpus == 1):
+        device = torch.device(f'cuda')
+    else:
+        device = torch.device(f'cuda:{rank}')
 
     data_path_list = ['./data/pretrain_data.bin']
+
+
     train_ds = PretrainDataset(data_path_list, max_length=config["max_seq_len"], use_memmap=True)
-    train_sampler = torch.utils.data.distributed.DistributedSampler(train_ds, num_replicas=num_gpus, rank=rank)
+    if (num_gpus > 1):
+        train_sampler = torch.utils.data.distributed.DistributedSampler(train_ds, num_replicas=num_gpus, rank=rank)
+    else:
+        train_sampler = None
+    
     train_loader = torch.utils.data.DataLoader(
         train_ds, batch_size=config["batch_size"],
         pin_memory=False, drop_last=False, shuffle=False,
@@ -57,24 +69,27 @@ def train(rank, num_gpus, config):
     )
 
     model = Transformer(config).to(device)
-    '''
-    ddp_model = DDP(model, device_ids=[rank])
+
+    if (num_gpus > 1):
+        model = DDP(model, device_ids=[rank])
+        raw_model = model.module
+    else:
+        raw_model = model
 
     scaler = torch.cuda.amp.GradScaler(enabled=(config['dtype'] == 'float16'))
-    optimizer = ddp_model.module.configure_optimizers(config["weight_decay"], config["learning_rate"], 
+    optimizer = model.configure_optimizers(config["weight_decay"], config["learning_rate"], 
                                                       (config["beta1"], config["beta2"]), config["device"])
-    raw_model = ddp_model.module
 
     if not os.path.exists(f'Weight/epoch_{config["max_epoch"] - 1}.pth'):
         for epoch in range(config["max_epoch"]):
-            train_epoch(epoch, ddp_model, raw_model, train_loader, optimizer, scaler,
+            train_epoch(epoch, raw_model, raw_model, train_loader, optimizer, scaler,
                         learning_rate=3e-4, decay_lr=None,
                         gradient_accumulation_steps=1, grad_clip=1.0,
                         device=device)
             if rank == 0:
                 torch.save(raw_model.state_dict(), f'Weight/epoch_{epoch}.pth')
 
-
+    '''
     SFT = config["SFT"]
     
     if SFT:
@@ -110,17 +125,19 @@ if __name__ == '__main__':
     setup_logging("./Log/training.log")
     num_gpus = check_available_gpus()
 
-    try:
-        mp.set_start_method('spawn')
-    except RuntimeError:
-        pass
+    if(num_gpus > 1):
+        try:
+            mp.set_start_method('spawn')
+        except RuntimeError:
+            pass
+        processes = []
+        for rank in range(num_gpus):
+            p = torch.multiprocessing.Process(target=init_process, args=(rank, num_gpus, train, config))
+            p.start()
+            processes.append(p)
 
-    processes = []
-    for rank in range(num_gpus):
-        p = torch.multiprocessing.Process(target=init_process, args=(rank, num_gpus, train, config))
-        p.start()
-        processes.append(p)
-
-    for p in processes:
-        p.join()
+        for p in processes:
+            p.join()
+    else:
+        train(rank = 0, num_gpus = 1, config = config)
 
