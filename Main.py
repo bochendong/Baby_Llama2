@@ -55,6 +55,7 @@ def train(rank, num_gpus, config):
         num_workers=0 if config["device"] == 'cpu' else 4,
         sampler=train_sampler
     )
+    '''
 
     model = Transformer(config).to(device)
     ddp_model = DDP(model, device_ids=[rank])
@@ -73,7 +74,7 @@ def train(rank, num_gpus, config):
             if rank == 0:
                 torch.save(raw_model.state_dict(), f'Weight/epoch_{epoch}.pth')
 
-    '''
+
     SFT = config["SFT"]
     
     if SFT:
