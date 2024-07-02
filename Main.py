@@ -21,6 +21,21 @@ from Code.DataSet.Dataset import PretrainDataset
 # from Code.SFT.Train.TrainSFT import train_SFT_epoch
 # from Code.SFT.DataClean.CleanAlpacaGpt4 import cleanAlpacaGpt4File
 
+import torch.nn as nn
+class SimpleNN(nn.Module):
+    def __init__(self):
+        super(SimpleNN, self).__init__()
+        self.fc1 = nn.Linear(28*28, 512)
+        self.fc2 = nn.Linear(512, 512)
+        self.fc3 = nn.Linear(512, 10)
+
+    def forward(self, x):
+        x = x.view(-1, 28*28)
+        x = torch.relu(self.fc1(x))
+        x = torch.relu(self.fc2(x))
+        x = self.fc3(x)
+        return x
+    
 def init_process(rank, num_gpus, train_fn, config, backend='nccl'):
     os.environ['MASTER_ADDR'] = 'localhost'
     os.environ['MASTER_PORT'] = '12355'
@@ -69,7 +84,7 @@ def train(rank, num_gpus, config):
         sampler=train_sampler
     )
 
-    model = Transformer(config).to(device)
+    model = SimpleNN().to(device)
     '''
     if (num_gpus > 1):
         model = DDP(model, device_ids=[rank])
