@@ -68,7 +68,7 @@ def train(rank, num_gpus, config):
         device = torch.device(f'cuda:{rank}')
 
     print(f"Device: {device}")
-    data_path_list = ['./data/pretrain_data.bin']
+    data_path_list = ['/lustre/orion/bif146/world-shared/enzhi/baby_llama/Baby_Llama2/data/pretrain_data.bin']
 
 
     train_ds = PretrainDataset(data_path_list, max_length=config["max_seq_len"], use_memmap=True)
@@ -106,7 +106,7 @@ def train(rank, num_gpus, config):
                 torch.save(raw_model.state_dict(), f'Weight/epoch_{epoch}.pth')
 
     SFT = config["SFT"]
-    
+
     if SFT:
         if not os.path.exists('./data/SFT/sft_data.csv'):
             df = pd.DataFrame(columns=['prompt', 'answer'])
