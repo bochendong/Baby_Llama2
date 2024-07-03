@@ -4,8 +4,10 @@ import numpy as np
 from tqdm import tqdm
 from Code.Tokenizer.GLMTokenizer import ChatGLMTokenizer
 
+dir_path = '/lustre/orion/bif146/world-shared/enzhi/baby_llama/Baby_Llama2'
+
 FileName = {
-    "Wiki": "./data/wikipedia-cn-20230720-filtered.json"
+    "Wiki": dir_path + "/data/wikipedia-cn-20230720-filtered.json"
 }
 
 def process_wiki_clean(tokenizer):
@@ -20,7 +22,7 @@ def process_wiki_clean(tokenizer):
         if len(text_id)>5:
             doc_ids += text_id
     arr = np.array(doc_ids, dtype=np.uint16)
-    with open('./data/wiki.bin','wb') as f:
+    with open(dir_path + '/data/wiki.bin','wb') as f:
         f.write(arr.tobytes())
 
 def DataPreProcess():
@@ -61,9 +63,10 @@ def DataPreProcess():
         './data/wudaocorpus_zh_16.bin',
     ]
 
-    tokenizer = ChatGLMTokenizer(vocab_file='./Code/Tokenizer/tokenizer.model')
 
-    if (os.path.exists("./data/wiki.bin") == False):
+    tokenizer = ChatGLMTokenizer(vocab_file= dir_path + '/Code/Tokenizer/tokenizer.model')
+
+    if (os.path.exists(dir_path + "/data/wiki.bin") == False):
         process_wiki_clean(tokenizer)
 
     data_lst=[]
@@ -73,12 +76,12 @@ def DataPreProcess():
                 data=np.fromfile(f,dtype=np.uint16)
                 data_lst.append(data)
     arr = np.concatenate(data_lst)
-    with open('./data/pretrain_data.bin','wb') as f:
+    with open(dir_path + '/data/pretrain_data.bin','wb') as f:
         f.write(arr.tobytes())
 
     f.close()
 
-    if os.path.exists("./data/pretrain_data.bin") == False:
+    if os.path.exists(dir_path + "/data/pretrain_data.bin") == False:
         print("There is no training data in the datafolder, Please download training data frist.")
 
     

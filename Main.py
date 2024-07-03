@@ -132,12 +132,14 @@ def train(rank, num_gpus, config):
     
 
 if __name__ == '__main__':
+    dir_path = '/lustre/orion/bif146/world-shared/enzhi/baby_llama/Baby_Llama2'
+
     config = read_config()
 
     if config["Preprocess"] == True:
         DataPreProcess()
     
-    setup_logging("./Log/training.log")
+    setup_logging(dir_path + "/Log/training.log")
     num_gpus = check_available_gpus()
 
     if(num_gpus > 1):
