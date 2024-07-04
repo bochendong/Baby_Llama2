@@ -167,15 +167,7 @@ if __name__ == '__main__':
     if config["Preprocess"] == True:
         DataPreProcess()
     
-    for rank in range(num_gpus):
-        p = torch.multiprocessing.Process(target=init_process, args=(rank, num_gpus, train, None))
-        p.start()
-        processes.append(p)
-
-    for p in processes:
-        p.join()
-
-    '''if(num_gpus > 1):
+    if(num_gpus > 1):
         try:
             mp.set_start_method('spawn')
         except RuntimeError:
@@ -189,5 +181,5 @@ if __name__ == '__main__':
         for p in processes:
             p.join()
     else:
-        train(rank = 0, num_gpus = 1, config = config)'''
+        train(rank = 0, num_gpus = 1, config = config)
 
