@@ -85,7 +85,7 @@ def train(rank, num_gpus, config):
     )
 
 
-    model = Transformer().to(device)
+    model = Transformer(config).to(device)
 
     if (num_gpus > 1):
         model = DDP(model, device_ids=[rank])
