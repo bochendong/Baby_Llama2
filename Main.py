@@ -38,7 +38,7 @@ class SimpleNN(nn.Module):
     
 def init_process(rank, num_gpus, train_fn, config, backend='nccl'):
     os.environ['MASTER_ADDR'] = 'localhost'
-    os.environ['MASTER_PORT'] = '12355'
+    os.environ['MASTER_PORT'] = '8080'
     torch.distributed.init_process_group(backend, rank=rank, world_size=num_gpus)
     train_fn(rank, num_gpus, config)
 
@@ -84,7 +84,6 @@ def train(rank, num_gpus, config):
         sampler=train_sampler
     )
 
-
     model = Transformer(config).to(device)
 
     if (num_gpus > 1):
@@ -92,11 +91,12 @@ def train(rank, num_gpus, config):
         raw_model = model.module
     else:
         raw_model = model
-    '''
+
 
     scaler = torch.cuda.amp.GradScaler(enabled=(config['dtype'] == 'float16'))
     optimizer = model.configure_optimizers(config["weight_decay"], config["learning_rate"], 
                                                       (config["beta1"], config["beta2"]), config["device"])
+    '''
     if not os.path.exists(f'Weight/epoch_{config["max_epoch"] - 1}.pth'):
         for epoch in range(config["max_epoch"]):
             train_epoch(epoch, raw_model, raw_model, train_loader, optimizer, scaler,
