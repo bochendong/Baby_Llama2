@@ -66,7 +66,7 @@ def train(rank, num_gpus, config):
         device = torch.device(f'cuda')
     else:
         device = torch.device(f'cuda:{rank}')
-    '''
+
     print(f"Device: {device}")
     data_path_list = ['/lustre/orion/bif146/world-shared/enzhi/baby_llama/Baby_Llama2/data/pretrain_data.bin']
 
@@ -83,10 +83,11 @@ def train(rank, num_gpus, config):
         num_workers=0 if num_gpus == 0 else 4,
         sampler=train_sampler
     )
-    '''
+
 
     model = SimpleNN().to(device)
     ddp_model = DDP(model, device_ids=[rank])
+    
     '''
     if (num_gpus > 1):
         model = DDP(model, device_ids=[rank])
