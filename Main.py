@@ -85,6 +85,8 @@ def train(rank, num_gpus, config):
     )
 
     model = Transformer(config).to(device)
+    optimizer = model.configure_optimizers(config["weight_decay"], config["learning_rate"], 
+                                            (config["beta1"], config["beta2"]), config["device"])
 
     if (num_gpus > 1):
         model = DDP(model, device_ids=[rank])
@@ -94,8 +96,6 @@ def train(rank, num_gpus, config):
 
 
     scaler = torch.cuda.amp.GradScaler(enabled=(config['dtype'] == 'float16'))
-    optimizer = model.configure_optimizers(config["weight_decay"], config["learning_rate"], 
-                                                      (config["beta1"], config["beta2"]), config["device"])
     '''
     if not os.path.exists(f'Weight/epoch_{config["max_epoch"] - 1}.pth'):
         for epoch in range(config["max_epoch"]):
