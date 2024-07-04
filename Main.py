@@ -134,6 +134,10 @@ def train(rank, num_gpus, config):
     
 
 if __name__ == '__main__':
+    num_gpus = check_available_gpus()
+    mp.set_start_method('spawn')
+    processes = []
+
     dir_path = '/lustre/orion/bif146/world-shared/enzhi/baby_llama/Baby_Llama2'
 
     config = {
@@ -163,10 +167,6 @@ if __name__ == '__main__':
     if config["Preprocess"] == True:
         DataPreProcess()
     
-
-    num_gpus = check_available_gpus()
-    mp.set_start_method('spawn')
-    processes = []
     for rank in range(num_gpus):
         p = torch.multiprocessing.Process(target=init_process, args=(rank, num_gpus, train, None))
         p.start()
