@@ -59,6 +59,7 @@ def check_available_gpus():
 
 def train(rank, num_gpus, config):
     torch.manual_seed(0)
+    dir_path = '/lustre/orion/bif146/world-shared/enzhi/baby_llama/Baby_Llama2'
 
     if (num_gpus == 0):
         device = torch.device(f'cpu')
@@ -68,8 +69,7 @@ def train(rank, num_gpus, config):
         device = torch.device(f'cuda:{rank}')
 
     print(f"Device: {device}")
-    data_path_list = ['/lustre/orion/bif146/world-shared/enzhi/baby_llama/Baby_Llama2/data/pretrain_data.bin']
-
+    data_path_list = [dir_path + '/data/pretrain_data.bin']
 
     train_ds = PretrainDataset(data_path_list, max_length=config["max_seq_len"], use_memmap=True)
     if (num_gpus > 1):
@@ -85,20 +85,18 @@ def train(rank, num_gpus, config):
     )
 
 
-    model = SimpleNN().to(device)
-    ddp_model = DDP(model, device_ids=[rank])
-    
-    '''
+    model = Transformer().to(device)
+
     if (num_gpus > 1):
         model = DDP(model, device_ids=[rank])
         raw_model = model.module
     else:
         raw_model = model
+    '''
 
     scaler = torch.cuda.amp.GradScaler(enabled=(config['dtype'] == 'float16'))
     optimizer = model.configure_optimizers(config["weight_decay"], config["learning_rate"], 
                                                       (config["beta1"], config["beta2"]), config["device"])
-
     if not os.path.exists(f'Weight/epoch_{config["max_epoch"] - 1}.pth'):
         for epoch in range(config["max_epoch"]):
             train_epoch(epoch, raw_model, raw_model, train_loader, optimizer, scaler,
