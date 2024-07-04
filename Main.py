@@ -134,17 +134,26 @@ def train(rank, num_gpus, config):
     
 
 if __name__ == '__main__':
-    dir_path = '/lustre/orion/bif146/world-shared/enzhi/baby_llama/Baby_Llama2'
+    '''dir_path = '/lustre/orion/bif146/world-shared/enzhi/baby_llama/Baby_Llama2'
 
     config = read_config()
 
     if config["Preprocess"] == True:
         DataPreProcess()
     
-    setup_logging(dir_path + "/Log/training.log")
+    setup_logging(dir_path + "/Log/training.log")'''
     num_gpus = check_available_gpus()
+    mp.set_start_method('spawn')
+    processes = []
+    for rank in range(num_gpus):
+        p = torch.multiprocessing.Process(target=init_process, args=(rank, num_gpus, train, None))
+        p.start()
+        processes.append(p)
 
-    if(num_gpus > 1):
+    for p in processes:
+        p.join()
+
+    '''if(num_gpus > 1):
         try:
             mp.set_start_method('spawn')
         except RuntimeError:
@@ -158,5 +167,5 @@ if __name__ == '__main__':
         for p in processes:
             p.join()
     else:
-        train(rank = 0, num_gpus = 1, config = config)
+        train(rank = 0, num_gpus = 1, config = config)'''
 
