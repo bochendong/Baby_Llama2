@@ -86,6 +86,7 @@ def train(rank, num_gpus, config):
     '''
 
     model = SimpleNN().to(device)
+    ddp_model = DDP(model, device_ids=[rank])
     '''
     if (num_gpus > 1):
         model = DDP(model, device_ids=[rank])
