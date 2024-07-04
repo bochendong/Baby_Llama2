@@ -136,15 +136,33 @@ def train(rank, num_gpus, config):
 if __name__ == '__main__':
     dir_path = '/lustre/orion/bif146/world-shared/enzhi/baby_llama/Baby_Llama2'
 
-    '''
-    config = read_config()
+    config = {
+        "Preprocess": True,
+        "SFT": False,
+        "DDP": True,
+        "embed_dim": 512,
+        "max_seq_len": 512,
+        "n_layers": 8,
+        "n_heads": 8,
+        "multiple_of": 32,
+        "dropout": 0.0,
+        "bias": False,
+        "learning_rate": 3e-4,
+        "weight_decay": 1e-1,
+        "beta1": 0.9,
+        "beta2": 0.95,
+        "grad_clip": 1.0,
+        "batch_size": 32,
+        "vocab_size": 64793,
+        "max_epoch": 1,
+        "device": "gpu",
+        "norm_eps": 1e-5,
+        "dtype": "float16"
+    }
 
     if config["Preprocess"] == True:
         DataPreProcess()
     
-
-    setup_logging(dir_path + "/Log/training.log")
-    '''
 
     num_gpus = check_available_gpus()
     mp.set_start_method('spawn')
