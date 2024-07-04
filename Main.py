@@ -96,18 +96,18 @@ def train(rank, num_gpus, config):
 
 
     scaler = torch.cuda.amp.GradScaler(enabled=(config['dtype'] == 'float16'))
-    '''
-    if not os.path.exists(f'Weight/epoch_{config["max_epoch"] - 1}.pth'):
+
+    if not os.path.exists(dir_path + f'/Weight/epoch_{config["max_epoch"] - 1}.pth'):
         for epoch in range(config["max_epoch"]):
             train_epoch(epoch, raw_model, raw_model, train_loader, optimizer, scaler,
                         learning_rate=3e-4, decay_lr=None,
                         gradient_accumulation_steps=1, grad_clip=1.0,
                         device=device)
             if rank == 0:
-                torch.save(raw_model.state_dict(), f'Weight/epoch_{epoch}.pth')
+                torch.save(raw_model.state_dict(), dir_path + f'/Weight/epoch_{epoch}.pth')
 
     SFT = config["SFT"]
-
+    '''
     if SFT:
         if not os.path.exists('./data/SFT/sft_data.csv'):
             df = pd.DataFrame(columns=['prompt', 'answer'])
